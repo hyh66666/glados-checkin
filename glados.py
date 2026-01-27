@@ -25,8 +25,9 @@ if __name__ == '__main__':
         exit(0)
 
     # 定义url等相关变量
-    url = "https://glados.cloud/api/user/checkin"
-    url2 = "https://glados.cloud/api/user/status"
+    checkin_url = "https://glados.cloud/api/user/checkin"
+    state_url = "https://glados.cloud/api/user/status"
+    points_url = "https://glados.cloud/api/user/points"
     referer = 'https://glados.cloud/console/checkin'
     origin = "https://glados.cloud"
     useragent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36"
@@ -35,27 +36,35 @@ if __name__ == '__main__':
     }
     left_time = ''
 
-    # 发起请求
-    checkin = requests.post(url, headers={'cookie': cookie, 'referer': referer, 'origin': origin,
+    # 发起签到请求
+    checkin_data = requests.post(checkin_url, headers={'cookie': cookie, 'referer': referer, 'origin': origin,
                                           'user-agent': useragent,
-                                          'content-type': 'application/json;charset=UTF-8'},
-                            data=json.dumps(payload))
-    state = requests.get(url2,
-                         headers={'cookie': cookie, 'referer': referer, 'origin': origin, 'user-agent': useragent})
+                                          'content-type': 'application/json;charset=UTF-8'}, data=json.dumps(payload))
+    # 查询签到状态请求
+    state_sata = requests.get(state_url, headers={'cookie': cookie, 'referer': referer, 'origin': origin, 'user-agent': useragent})
+
+    # 查询剩余积分请求
+    points_data = requests.get(points_url,  headers={'cookie': cookie, 'referer': referer, 'origin': origin, 'user-agent': useragent})
 
     # --------------------------------------------------------------------------------------------------------#
-    # 解析请求
-    code = state.json()['code']
-    if code != 0:
-        print(state.json()['message'])
-        sendContent += state.json()['message']
+    # 解析剩余积分请求
+    point_code = points_data.json()['code']
+    if point_code == 0:
+        points = points_data.json()['points'].split('.')[0]
+        sendContent += '剩余积分：' + points + '\n'
+
+    # 解析签到状态请求
+    state_code = state_sata.json()['code']
+    if state_code != 0:
+        print(state_sata.json()['message'])
+        sendContent += state_sata.json()['message']
     else:
-        time = state.json()['data']['leftDays']
+        time = state_sata.json()['data']['leftDays']
         time = time.split('.')[0]
         left_time = time
-        email = state.json()['data']['email']
-        if 'message' in checkin.text:
-            mess = checkin.json()['message']
+        email = state_sata.json()['data']['email']
+        if 'message' in checkin_data.text:
+            mess = checkin_data.json()['message']
             if 'Repeats' in mess:
                 mess = "Checkin Repeats!"
                 print(mess + '--剩余(' + time + ')天\n' + email)  # 日志输出
