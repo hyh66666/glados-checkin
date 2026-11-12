@@ -25,11 +25,11 @@ if __name__ == '__main__':
         exit(0)
 
     # 定义url等相关变量
-    checkin_url = "https://railgun.info/api/user/checkin"
-    state_url = "https://railgun.info/api/user/status"
-    points_url = "https://railgun.info/api/user/points"
-    referer = 'https://railgun.info/console/checkin'
-    origin = "https://railgun.info"
+    checkin_url = "https://glados.network/api/user/checkin"
+    state_url = "https://glados.network/api/user/status"
+    points_url = "https://glados.network/api/user/points"
+    referer = 'https://glados.network/console/checkin'
+    origin = "https://glados.network"
     useragent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36"
     payload = {
         'token': 'railgun.info'
